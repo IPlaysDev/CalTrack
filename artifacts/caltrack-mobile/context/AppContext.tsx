@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { playCalorieAddedSound, playTapSound, setSoundEffectsEnabled } from '@/lib/sounds';
 
 export type Gender = 'Female' | 'Male' | 'Non-binary' | 'Prefer not to say';
 
@@ -27,6 +28,7 @@ type StoredState = {
   profile: Profile | null;
   foods: Food[];
   entries: CalorieEntry[];
+  soundEffects: boolean;
 };
 
 type AppContextValue = StoredState & {
@@ -35,11 +37,13 @@ type AppContextValue = StoredState & {
   updateProfile: (profile: Profile) => Promise<void>;
   addFood: (food: Omit<Food, 'id'>) => Promise<void>;
   addEntry: (food: Omit<Food, 'id'>, date?: Date) => Promise<void>;
+  setSoundEffects: (enabled: boolean) => Promise<void>;
   resetData: () => Promise<void>;
 };
 
 const STORAGE_KEY = '@caltrack/state';
 const AppContext = createContext<AppContextValue | null>(null);
+const emptyState: StoredState = { profile: null, foods: [], entries: [], soundEffects: true };
 
 const makeId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -61,13 +65,20 @@ export function getDayKey(date: Date) {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<StoredState>({ profile: null, foods: [], entries: [] });
+  const [state, setState] = useState<StoredState>(emptyState);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
       .then((saved) => {
-        if (saved) setState(JSON.parse(saved) as StoredState);
+        if (saved) {
+          const stored = JSON.parse(saved) as Partial<StoredState>;
+          const next = { ...emptyState, ...stored };
+          setState(next);
+          setSoundEffectsEnabled(next.soundEffects);
+        } else {
+          setSoundEffectsEnabled(true);
+        }
       })
       .catch(() => undefined)
       .finally(() => setIsReady(true));
@@ -81,6 +92,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const completeSetup = async (profile: Profile) => persist({ ...state, profile });
   const updateProfile = async (profile: Profile) => persist({ ...state, profile });
   const addFood = async (food: Omit<Food, 'id'>) => {
+    playTapSound();
     await persist({ ...state, foods: [{ ...food, id: makeId() }, ...state.foods] });
   };
   const addEntry = async (food: Omit<Food, 'id'>, date = new Date()) => {
@@ -90,15 +102,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       date: dayKey(date),
       time: date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
     };
+    playCalorieAddedSound();
     await persist({ ...state, entries: [entry, ...state.entries] });
+  };
+  const setSoundEffects = async (enabled: boolean) => {
+    setSoundEffectsEnabled(enabled);
+    await persist({ ...state, soundEffects: enabled });
   };
   const resetData = async () => {
     await AsyncStorage.removeItem(STORAGE_KEY);
-    setState({ profile: null, foods: [], entries: [] });
+    setSoundEffectsEnabled(true);
+    setState(emptyState);
   };
 
   const value = useMemo(
-    () => ({ ...state, isReady, completeSetup, updateProfile, addFood, addEntry, resetData }),
+    () => ({ ...state, isReady, completeSetup, updateProfile, addFood, addEntry, setSoundEffects, resetData }),
     [state, isReady],
   );
 

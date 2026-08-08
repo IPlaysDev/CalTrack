@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { AppLogo, Field, PrimaryButton } from '@/components/CaltrackUI';
+import { AppLogo, Field, PrimaryButton, Sheet } from '@/components/CaltrackUI';
 import { Gender, useApp } from '@/context/AppContext';
 import { useColors } from '@/hooks/useColors';
 
@@ -21,6 +21,7 @@ export default function OnboardingScreen() {
   const [weight, setWeight] = useState('');
   const [goal, setGoal] = useState('2000');
   const [error, setError] = useState('');
+  const [showGenderPicker, setShowGenderPicker] = useState(false);
 
   React.useEffect(() => {
     if (isReady && profile) router.replace('/(tabs)');
@@ -71,14 +72,10 @@ export default function OnboardingScreen() {
               <Field label="YOUR NAME" value={name} onChangeText={setName} placeholder="e.g. Alex" />
               <Field label="AGE" value={age} onChangeText={setAge} placeholder="e.g. 28" keyboardType="numeric" />
               <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>GENDER</Text>
-              <View style={styles.genderGrid}>
-                {genders.map((item) => (
-                  <Pressable key={item} onPress={() => setGender(item)} style={[styles.genderChip, { backgroundColor: gender === item ? colors.softOrange : colors.input, borderColor: gender === item ? colors.primary : colors.border }]}>
-                    <Text style={[styles.genderText, { color: gender === item ? colors.primary : colors.mutedForeground }]}>{item}</Text>
-                    {gender === item ? <Ionicons name="checkmark-circle" size={16} color={colors.primary} /> : null}
-                  </Pressable>
-                ))}
-              </View>
+              <Pressable onPress={() => setShowGenderPicker(true)} style={[styles.genderSelect, { backgroundColor: colors.input, borderColor: colors.border }]}>
+                <Text style={[styles.genderText, { color: colors.foreground }]}>{gender || 'Select gender'}</Text>
+                <Ionicons name="chevron-down" size={18} color={colors.mutedForeground} />
+              </Pressable>
               {error ? <Text style={[styles.error, { color: colors.destructive }]}>{error}</Text> : null}
               <PrimaryButton label="Continue" onPress={goNext} icon="arrow-forward" />
             </>
@@ -97,6 +94,17 @@ export default function OnboardingScreen() {
           )}
         </View>
       </KeyboardAwareScrollViewCompat>
+      <Sheet visible={showGenderPicker} title="Select gender" onClose={() => setShowGenderPicker(false)}>
+        <Text style={[styles.genderHelper, { color: colors.mutedForeground }]}>Choose the option that feels right for you.</Text>
+        <View style={styles.genderGrid}>
+          {genders.map((item) => (
+            <Pressable key={item} onPress={() => { setGender(item); setShowGenderPicker(false); }} style={[styles.genderChip, { backgroundColor: gender === item ? colors.softOrange : colors.input, borderColor: gender === item ? colors.primary : colors.border }]}>
+              <Text style={[styles.genderText, { color: gender === item ? colors.primary : colors.mutedForeground }]}>{item}</Text>
+              {gender === item ? <Ionicons name="checkmark-circle" size={16} color={colors.primary} /> : null}
+            </Pressable>
+          ))}
+        </View>
+      </Sheet>
     </View>
   );
 }
@@ -117,8 +125,10 @@ const styles = StyleSheet.create({
   form: { paddingHorizontal: 22 },
   fieldLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 10, letterSpacing: 1.4, marginBottom: 9 },
   genderGrid: { gap: 9, marginBottom: 20 },
+  genderSelect: { minHeight: 54, borderWidth: 1, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 20 },
   genderChip: { minHeight: 48, borderWidth: 1, borderRadius: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 15 },
   genderText: { fontFamily: 'Inter_500Medium', fontSize: 14 },
+  genderHelper: { fontFamily: 'Inter_400Regular', fontSize: 13, lineHeight: 19, marginBottom: 18 },
   error: { fontFamily: 'Inter_500Medium', fontSize: 12, marginBottom: 13 },
   tip: { borderRadius: 16, borderWidth: 1, padding: 14, flexDirection: 'row', gap: 10, alignItems: 'center', marginBottom: 20 },
   tipText: { fontFamily: 'Inter_400Regular', fontSize: 12, lineHeight: 17, flex: 1 },

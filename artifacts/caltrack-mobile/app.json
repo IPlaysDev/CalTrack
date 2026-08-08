@@ -11,14 +11,14 @@
     "splash": {
       "image": "./assets/images/caltrack-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0B0D11"
     },
     "ios": {
       "supportsTablet": false
     },
     "android": {},
     "web": {
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/caltrack-icon.png"
     },
     "plugins": [
       [

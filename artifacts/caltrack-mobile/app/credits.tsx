@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Feather } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
@@ -24,11 +24,16 @@ export default function CreditsScreen() {
     if (taps.current >= 7) {
       taps.current = 0;
       scale.value = withSequence(withTiming(1.14, { duration: 180 }), withTiming(0.98, { duration: 130 }), withTiming(1, { duration: 260 }));
-      opacity.value = withSequence(withTiming(0.08, { duration: 400 }), withTiming(1, { duration: 650 }));
+      opacity.value = withTiming(0, { duration: 500 });
     } else {
       scale.value = withSequence(withTiming(1.07, { duration: 100 }), withTiming(1, { duration: 180 }));
     }
   };
+  useEffect(() => () => {
+    taps.current = 0;
+    scale.value = 1;
+    opacity.value = 1;
+  }, [opacity, scale]);
   return (
     <Screen scroll={false} contentStyle={styles.content}>
       <Pressable onPress={() => router.back()} style={styles.back}><Feather name="arrow-left" size={21} color={colors.foreground} /><Text style={[styles.backText, { color: colors.foreground }]}>Settings</Text></Pressable>

@@ -17,6 +17,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
+import { playTapSound } from '@/lib/sounds';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 
@@ -37,14 +39,15 @@ export function Screen({
     </View>
   );
   return scroll ? (
-    <ScrollView
+    <KeyboardAwareScrollViewCompat
       style={[styles.screen, { backgroundColor: colors.background }]}
       contentContainerStyle={{ minHeight: '100%' }}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
+      bottomOffset={34}
     >
       {content}
-    </ScrollView>
+    </KeyboardAwareScrollViewCompat>
   ) : (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>{content}</View>
   );
@@ -62,9 +65,9 @@ export function GlassCard({ children, style, strong = false }: { children: React
 export function AppLogo({ size = 42 }: { size?: number }) {
   const colors = useColors();
   return (
-    <View style={[styles.logo, { width: size, height: size, borderRadius: size * 0.3, backgroundColor: colors.softOrange, borderColor: colors.orangeGlow }]}>
-      <View style={[styles.logoRing, { width: size * 0.59, height: size * 0.59, borderRadius: size, borderColor: colors.primary }]}>
-        <View style={[styles.logoDrop, { backgroundColor: colors.primary, width: size * 0.16, height: size * 0.29, borderRadius: size }]} />
+    <View style={[styles.logo, { width: size, height: size, borderRadius: size / 2, backgroundColor: colors.background, borderColor: colors.primary }]}>
+      <View style={[styles.logoLiquid, { height: size * 0.46, backgroundColor: colors.primary }]}>
+        <View style={[styles.logoWave, { backgroundColor: colors.primary, top: -size * 0.11 }]} />
       </View>
     </View>
   );
@@ -115,6 +118,7 @@ export function PrimaryButton({
       disabled={disabled}
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
+        playTapSound();
         onPress();
       }}
       style={({ pressed }) => [styles.primaryButton, { backgroundColor: colors.primary, opacity: disabled ? 0.4 : pressed ? 0.82 : 1 }]}
@@ -247,7 +251,14 @@ export function Sheet({ visible, title, onClose, children }: { visible: boolean;
             <Text style={[styles.sheetTitle, { color: colors.foreground }]}>{title}</Text>
             <Pressable onPress={onClose} style={styles.iconButton} hitSlop={8}><Ionicons name="close" size={22} color={colors.foreground} /></Pressable>
           </View>
-          {children}
+          <KeyboardAwareScrollViewCompat
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            bottomOffset={34}
+            contentContainerStyle={styles.sheetContent}
+          >
+            {children}
+          </KeyboardAwareScrollViewCompat>
         </View>
       </View>
     </Modal>
@@ -289,9 +300,9 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   screenContent: { paddingHorizontal: 20 },
   glassCard: { borderWidth: 1, borderRadius: 24, padding: 18, overflow: 'hidden' },
-  logo: { alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-  logoRing: { alignItems: 'center', justifyContent: 'flex-end', borderWidth: 2, paddingBottom: 5 },
-  logoDrop: { transform: [{ rotate: '10deg' }] },
+  logo: { alignItems: 'center', justifyContent: 'flex-end', borderWidth: 2, overflow: 'hidden' },
+  logoLiquid: { position: 'absolute', bottom: 0, left: 0, right: 0, opacity: 0.96 },
+  logoWave: { position: 'absolute', left: '-12%', width: '124%', height: 12, borderRadius: 20 },
   pageHeader: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 25 },
   eyebrow: { fontFamily: 'Inter_600SemiBold', fontSize: 11, letterSpacing: 1.7, marginBottom: 7 },
   pageTitle: { fontFamily: 'Inter_700Bold', fontSize: 29, letterSpacing: -0.7 },
@@ -324,6 +335,7 @@ const styles = StyleSheet.create({
   entryCalories: { fontFamily: 'Inter_600SemiBold', fontSize: 13 },
   modalBackdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.58)' },
   sheet: { borderTopLeftRadius: 30, borderTopRightRadius: 30, borderWidth: 1, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 34, maxHeight: '92%' },
+  sheetContent: { paddingBottom: 3 },
   sheetHandle: { width: 42, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.25)', alignSelf: 'center', marginBottom: 17 },
   sheetHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
   sheetTitle: { fontFamily: 'Inter_700Bold', fontSize: 22 },

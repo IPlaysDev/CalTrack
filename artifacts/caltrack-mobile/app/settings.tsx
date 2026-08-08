@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useApp } from '@/context/AppContext';
@@ -8,7 +8,7 @@ import { Field, GlassCard, PageHeader, PrimaryButton, Screen, Sheet, TextButton 
 
 export default function SettingsScreen() {
   const colors = useColors();
-  const { profile, updateProfile, resetData } = useApp();
+  const { profile, soundEffects, setSoundEffects, updateProfile, resetData } = useApp();
   const [showEdit, setShowEdit] = useState(false);
   const [name, setName] = useState(profile?.name ?? '');
   const [age, setAge] = useState(String(profile?.age ?? ''));
@@ -32,6 +32,11 @@ export default function SettingsScreen() {
       <Text style={[styles.groupLabel, { color: colors.mutedForeground }]}>ABOUT CALTRACK</Text>
       <GlassCard style={styles.settingsCard}>
         <SettingRow icon="heart" label="Credits" value="IPlaysDev" onPress={() => router.push('/credits')} />
+        <View style={[styles.settingRow, { borderBottomColor: colors.border }]}>
+          <View style={[styles.settingIcon, { backgroundColor: colors.softOrange }]}><Feather name="volume-2" size={17} color={colors.primary} /></View>
+          <View style={{ flex: 1 }}><Text style={[styles.settingLabel, { color: colors.foreground }]}>Sound Effects</Text><Text style={[styles.settingValue, { color: colors.mutedForeground }]}>{soundEffects ? 'ON' : 'OFF'}</Text></View>
+          <Switch value={soundEffects} onValueChange={setSoundEffects} trackColor={{ false: colors.border, true: colors.orangeGlow }} thumbColor={soundEffects ? colors.primary : colors.mutedForeground} />
+        </View>
       </GlassCard>
       <Pressable onPress={reset} style={({ pressed }) => [styles.resetButton, { opacity: pressed ? 0.55 : 1 }]}><Ionicons name="trash-outline" size={17} color={colors.destructive} /><Text style={[styles.resetText, { color: colors.destructive }]}>Reset all data</Text></Pressable>
       <Sheet visible={showEdit} title="Edit profile" onClose={() => setShowEdit(false)}>

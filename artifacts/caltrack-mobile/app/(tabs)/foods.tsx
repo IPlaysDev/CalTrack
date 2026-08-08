@@ -7,13 +7,14 @@ import { EmptyState, Field, GlassCard, PageHeader, PhotoPicker, PrimaryButton, S
 
 export default function FoodsScreen() {
   const colors = useColors();
-  const { foods, addFood } = useApp();
+  const { foods, addFood, addEntry } = useApp();
   const [showAdd, setShowAdd] = useState(false);
   const [name, setName] = useState('');
   const [calories, setCalories] = useState('');
   const [photoUri, setPhotoUri] = useState<string | undefined>();
   const close = () => { setShowAdd(false); setName(''); setCalories(''); setPhotoUri(undefined); };
   const save = async () => { if (!name.trim() || Number(calories) <= 0) return; await addFood({ name: name.trim(), calories: Number(calories), photoUri }); close(); };
+  const quickAdd = async (food: Food) => addEntry(food);
   return (
     <Screen>
       <PageHeader eyebrow="YOUR LIBRARY" title="Foods" subtitle="Your go-to fuel, ready in one tap." />
@@ -23,7 +24,7 @@ export default function FoodsScreen() {
       </GlassCard>
       <PrimaryButton label="Add Food" icon="add" onPress={() => setShowAdd(true)} />
       <View style={styles.section}><SectionLabel>SAVED FOODS · {foods.length}</SectionLabel></View>
-      {foods.length ? <GlassCard style={styles.foodCard}>{foods.map((food) => <FoodRow key={food.id} food={food} />)}</GlassCard> : <GlassCard style={styles.emptyCard}><EmptyState icon="nutrition-outline" title="No saved foods" text="Add your favorite meals, snacks, and drinks here." /></GlassCard>}
+      {foods.length ? <GlassCard style={styles.foodCard}>{foods.map((food) => <FoodRow key={food.id} food={food} onQuickAdd={() => quickAdd(food)} />)}</GlassCard> : <GlassCard style={styles.emptyCard}><EmptyState icon="nutrition-outline" title="No saved foods yet" text="Add your first food to quickly track it later." /></GlassCard>}
       <Sheet visible={showAdd} title="Save a food" onClose={close}>
         <Field label="FOOD OR BEVERAGE" value={name} onChangeText={setName} placeholder="e.g. Chicken Biryani" />
         <Field label="CALORIES · KCAL" value={calories} onChangeText={setCalories} placeholder="e.g. 650" keyboardType="numeric" />
@@ -34,14 +35,16 @@ export default function FoodsScreen() {
   );
 }
 
-function FoodRow({ food }: { food: Food }) {
+function FoodRow({ food, onQuickAdd }: { food: Food; onQuickAdd: () => void }) {
   const colors = useColors();
   return (
     <View style={[styles.foodRow, { borderBottomColor: colors.border }]}>
       {food.photoUri ? <Image source={{ uri: food.photoUri }} style={styles.foodPhoto} /> : <View style={[styles.foodPhoto, { backgroundColor: colors.softOrange }]}><Ionicons name="restaurant-outline" size={21} color={colors.primary} /></View>}
       <View style={{ flex: 1 }}><Text style={[styles.foodName, { color: colors.foreground }]}>{food.name}</Text><Text style={[styles.foodHint, { color: colors.mutedForeground }]}>Saved shortcut</Text></View>
       <Text style={[styles.foodCalories, { color: colors.primary }]}>{food.calories} kcal</Text>
-      <Feather name="chevron-right" size={17} color={colors.mutedForeground} />
+      <Pressable accessibilityLabel={`Add ${food.name}`} onPress={onQuickAdd} hitSlop={8} style={({ pressed }) => [styles.quickAdd, { backgroundColor: colors.softOrange, opacity: pressed ? 0.55 : 1 }]}>
+        <Feather name="plus" size={18} color={colors.primary} />
+      </Pressable>
     </View>
   );
 }
@@ -59,4 +62,5 @@ const styles = StyleSheet.create({
   foodName: { fontFamily: 'Inter_600SemiBold', fontSize: 14 },
   foodHint: { fontFamily: 'Inter_400Regular', fontSize: 11, marginTop: 4 },
   foodCalories: { fontFamily: 'Inter_600SemiBold', fontSize: 12 },
+  quickAdd: { width: 34, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });

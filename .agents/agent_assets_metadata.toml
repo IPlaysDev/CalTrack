@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "4l-FQPp8GucZcwBuRHD_1"
+uri = "file://artifacts/caltrack-mobile/assets/sounds/ui-tap.mp3"
+type = "audio"
+title = "Caltrack UI tap"
+description = "Generated sound effect: A short, subtle warm glassy UI tap for a premium dark mobile app, clean single tick, no melody, quiet and pleasant"
+
+[[outputs]]
+id = "wkjqAvz9mpo5dBHHIheaP"
+uri = "file://artifacts/caltrack-mobile/assets/sounds/calorie-added.mp3"
+type = "audio"
+title = "Calorie added chime"
+description = "Generated sound effect: A short, distinct but subtle positive calorie added confirmation chime for a premium health mobile app, warm soft two-note glass tone, quiet and pleasant"

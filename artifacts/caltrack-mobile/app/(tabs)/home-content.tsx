@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -14,7 +14,13 @@ export default function HomeScreen() {
   const [name, setName] = useState('');
   const [calories, setCalories] = useState('');
   const [photoUri, setPhotoUri] = useState<string | undefined>();
-  const today = getDayKey(new Date());
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+  const today = getDayKey(now);
+  const dateLabel = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
   const todayEntries = useMemo(() => entries.filter((entry) => entry.date === today), [entries, today]);
   const consumed = todayEntries.reduce((sum, entry) => sum + entry.calories, 0);
   const remaining = Math.max((profile?.calorieGoal ?? 0) - consumed, 0);
@@ -38,7 +44,7 @@ export default function HomeScreen() {
 
   return (
     <Screen>
-      <PageHeader eyebrow="TODAY · YOUR FUEL" title={`Hello, ${profile?.name ?? 'there'}.`} subtitle="Stay curious about what fuels you." onPress={() => router.push('/settings')} />
+      <PageHeader eyebrow={dateLabel} title={`Hello, ${profile?.name ?? 'there'}.`} subtitle="Stay curious about what fuels you." onPress={() => router.push('/settings')} />
       <View style={styles.ringWrap}>
         <CalorieRing consumed={consumed} goal={profile?.calorieGoal ?? 2000} />
         <View style={[styles.remainingPill, { backgroundColor: colors.softOrange, borderColor: colors.orangeGlow }]}>
@@ -56,6 +62,16 @@ export default function HomeScreen() {
           <View style={styles.stat}><Text style={[styles.statValue, { color: colors.primary }]}>{todayEntries.length}</Text><Text style={[styles.statLabel, { color: colors.mutedForeground }]}>ITEMS</Text></View>
         </View>
       </GlassCard>
+      {consumed > (profile?.calorieGoal ?? 0) ? (
+        <GlassCard style={[styles.warningCard, { backgroundColor: colors.softOrange, borderColor: colors.orangeGlow }]}>
+          <View style={[styles.warningIcon, { backgroundColor: colors.primary }]}><Ionicons name="warning-outline" size={18} color={colors.primaryForeground} /></View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.warningTitle, { color: colors.accent }]}>Calorie limit exceeded</Text>
+            <Text style={[styles.warningMeta, { color: colors.mutedForeground }]}>{consumed.toLocaleString()} / {profile?.calorieGoal.toLocaleString()} kcal</Text>
+            <Text style={[styles.warningOver, { color: colors.primary }]}>{(consumed - (profile?.calorieGoal ?? 0)).toLocaleString()} kcal over your daily goal</Text>
+          </View>
+        </GlassCard>
+      ) : null}
       <PrimaryButton label="Calorie Intake" icon="add" onPress={() => setShowAdd(true)} />
       <View style={styles.sectionHeader}><SectionLabel>TODAY’S INTAKE</SectionLabel>{todayEntries.length > 0 ? <Text style={[styles.itemCount, { color: colors.mutedForeground }]}>{todayEntries.length} items</Text> : null}</View>
       <GlassCard style={styles.listCard}>
@@ -87,6 +103,11 @@ const styles = StyleSheet.create({
   dot: { width: 6, height: 6, borderRadius: 3 },
   remainingText: { fontFamily: 'Inter_600SemiBold', fontSize: 12 },
   summaryCard: { paddingVertical: 16, marginBottom: 14 },
+  warningCard: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14, padding: 15 },
+  warningIcon: { width: 36, height: 36, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  warningTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 14 },
+  warningMeta: { fontFamily: 'Inter_500Medium', fontSize: 12, marginTop: 4 },
+  warningOver: { fontFamily: 'Inter_600SemiBold', fontSize: 11, marginTop: 4 },
   summaryTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   summaryTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 14 },
   statsRow: { flexDirection: 'row', alignItems: 'center' },
