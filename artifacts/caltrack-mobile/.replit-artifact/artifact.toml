@@ -1,0 +1,24 @@
+kind = "mobile"
+previewPath = "/"
+title = "Caltrack"
+description = "An offline-first mobile calorie tracker for setting a daily goal, logging food with optional photos, saving favorite foods, browsing daily history, and managing a personal profile on Android and iOS."
+version = "1.0.0"
+id = "artifacts/caltrack-mobile"
+router = "expo-domain"
+
+[[services]]
+name = "expo"
+ensurePreviewReachable = "/status"
+paths = [ "/" ]
+localPort = 24849
+
+[services.development]
+run = "pnpm --filter @workspace/caltrack-mobile run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/caltrack-mobile", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/caltrack-mobile", "run", "serve" ]
+
+[services.env]
+PORT = "24849"
+BASE_PATH = "/"
