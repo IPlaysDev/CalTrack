@@ -1,4 +1,4 @@
-##CalTrack
+CalTrack
 
 CalTrack is a simple calorie tracking app designed to help you keep track of your daily calorie intake, manage your food and drinks, and look back at your eating history.
 
