@@ -17,7 +17,7 @@ export default function OnboardingScreen() {
   const [step, setStep] = useState<1 | 2>(1);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [gender, setGender] = useState<Gender>('Prefer not to say');
+  const [gender, setGender] = useState<Gender | null>(null);
   const [weight, setWeight] = useState('');
   const [goal, setGoal] = useState('2000');
   const [error, setError] = useState('');
@@ -41,6 +41,11 @@ export default function OnboardingScreen() {
   const finish = async () => {
     if (!weight.trim() || !goal.trim() || Number(goal) <= 0) {
       setError('Add your weight and a daily calorie goal.');
+      return;
+    }
+    if (!gender) {
+      setError('Select a gender option to continue.');
+      setStep(1);
       return;
     }
     await completeSetup({ name: name.trim(), age: Number(age), gender, weight: Number(weight), calorieGoal: Number(goal) });
@@ -73,7 +78,7 @@ export default function OnboardingScreen() {
               <Field label="AGE" value={age} onChangeText={setAge} placeholder="e.g. 28" keyboardType="numeric" />
               <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>GENDER</Text>
               <Pressable onPress={() => setShowGenderPicker(true)} style={[styles.genderSelect, { backgroundColor: colors.input, borderColor: colors.border }]}>
-                <Text style={[styles.genderText, { color: colors.foreground }]}>{gender || 'Select gender'}</Text>
+                <Text style={[styles.genderText, { color: gender ? colors.foreground : colors.mutedForeground }]}>{gender ?? 'Select gender'}</Text>
                 <Ionicons name="chevron-down" size={18} color={colors.mutedForeground} />
               </Pressable>
               {error ? <Text style={[styles.error, { color: colors.destructive }]}>{error}</Text> : null}

@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import { createAudioPlayer } from 'expo-audio';
 
 let soundEffectsEnabled = true;
 
@@ -12,9 +12,11 @@ export function setSoundEffectsEnabled(enabled: boolean) {
 async function playAsset(asset: number, unloadAfterMs: number) {
   if (!soundEffectsEnabled) return;
   try {
-    const { sound } = await Audio.Sound.createAsync(asset, { shouldPlay: true, volume: 0.28 });
+    const player = createAudioPlayer(asset, { downloadFirst: true });
+    player.volume = 0.28;
+    player.play();
     setTimeout(() => {
-      sound.unloadAsync().catch(() => undefined);
+      player.remove();
     }, unloadAfterMs);
   } catch {
     // Audio is enhancement-only; logging and tracking remain fully offline.

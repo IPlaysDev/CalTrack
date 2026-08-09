@@ -1,0 +1,1 @@
+- [Expo audio compatibility](expo-audio-compatibility.md) — SDK 54 sound effects should use `expo-audio`, not deprecated `expo-av`.
