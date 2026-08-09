@@ -7,11 +7,11 @@ Everything is presented through a clean dark glassmorphism interface with an int
 Screenshots
 <img width="1080" height="2158" alt="Screenshot_20260809_155421_Caltrack" src="https://github.com/user-attachments/assets/2009835c-7f3f-4b5f-ba74-7e7f57e08298" />
 <img width="1080" height="2185" alt="Screenshot_20260809_155716_Caltrack" src="https://github.com/user-attachments/assets/8d6d684e-713f-4616-8346-bb5da04e7d6a" />
-<img width="1080" height="2197" alt="Screenshot_20260809_155728_Caltrack" src="https://github.com/user-attachments/assets/42df9241-8e87-4785-90f1-50de42ca4f28" />
-<img width="1080" height="2195" alt="Screenshot_20260809_155413_Caltrack" src="https://github.com/user-attachments/assets/12d23330-e2aa-46ca-a60c-542071e859a6" />
+<img width="1080" height="2195" alt="Screenshot_20260809_155413_Caltrack" src="https://github.com/user-attachments/assets/259a5287-7de2-40ed-94c9-3614c62a153d" />
+<img width="1080" height="2197" alt="Screenshot_20260809_155728_Caltrack" src="https://github.com/user-attachments/assets/d38ab4df-5578-4938-93c9-6ed4bb88ed00" />
 
 
-
+#Features
 - Daily Calorie Tracking
   Track your daily calorie intake and see how much of your calorie goal remains.
 
