@@ -16,7 +16,9 @@
     "ios": {
       "supportsTablet": false
     },
-    "android": {},
+    "android": {
+      "package": "com.iplaysdev.caltrack"
+    },
     "web": {
       "favicon": "./assets/images/caltrack-icon.png"
     },
@@ -40,6 +42,11 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "86e64970-fb30-494a-83b0-3a5384d651e2"
+      }
     }
   }
 }
