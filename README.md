@@ -50,4 +50,5 @@ Everything is presented through a clean dark glassmorphism interface with an int
 
 - Settings
   Manage your profile, calorie goal, and application data.
-
+### Download 
+https://github.com/IPlaysDev/CalTrack/releases/tag/v1
